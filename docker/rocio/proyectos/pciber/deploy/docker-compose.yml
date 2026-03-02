@@ -1,0 +1,21 @@
+services:
+  web:
+    build:
+      context: ${CONTEXTO}
+      dockerfile: ./dockerfiles/ciber/dockerfiles
+    container_name: ${CONTAINER_NAME}
+    image: rocio/ciber
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs:/root/logs
+    networks:
+      netrociociber:
+        ipv4_address: ${IP_WEB}
+networks:
+  netrociociber:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}

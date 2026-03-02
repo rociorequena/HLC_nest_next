@@ -1,0 +1,19 @@
+FROM rocio/nginx
+
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    ca-certificates \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /root/admin/node_next
+WORKDIR /root/admin/node_next
+RUN mkdir -p /root/admin/node_next/proyecto-next
+COPY ./proyectos/next/instituto-next/ ./proyecto-next/
+COPY ./dockerfiles/node_next/admin/ ./
+RUN chmod +x ./start.sh
+
+EXPOSE 3001
+ENTRYPOINT ["./start.sh"]

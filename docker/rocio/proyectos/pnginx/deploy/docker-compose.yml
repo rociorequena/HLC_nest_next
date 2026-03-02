@@ -1,0 +1,23 @@
+services:
+  web:
+    build:
+      context: ${CONTEXTO}
+      dockerfile: ./dockerfiles/nginx/dockerfiles
+    container_name: ${CONTAINER_NAME}
+    image: rocio/nginx
+    ports:
+      - "8081:80"
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs:/root/logs
+    networks:
+      netrocionginx:
+        ipv4_address: ${IP_WEB}
+networks:
+  netrocionginx:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}

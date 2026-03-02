@@ -1,0 +1,13 @@
+services:
+  servidor_next:
+    image: rocio/instuto-next
+    container_name: nginx_next_final
+    ports:
+      - "8080:80"
+    restart: always
+    networks:
+      - caronte_net
+
+networks:
+  caronte_net:
+    external: true
