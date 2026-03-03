@@ -1,0 +1,82 @@
+services:
+  # Base
+  base:
+    build: 
+      context: ../dockerfiles/base
+    image: ${IMAGE_BASE}
+
+  # Ciber
+  ciber:
+    build: 
+      context: ../dockerfiles/ciber
+    image: ${IMAGE_CIBER}
+    depends_on:
+      - base
+
+  # FTP
+  servicio-ftp:
+    build: 
+      context: ../dockerfiles/final
+    image: ${IMAGE_FINAL}
+    container_name: ${CONTAINER_NAME}
+    stdin_open: true
+    tty: true
+    ports:
+      - "${VNC_PORT_EXTERNAL}:8080"
+      - "${FTP_PORT_EXTERNAL}:21"
+      - "40000-40100:40000-40100"
+    environment:
+      - VNC_PASS=${VNC_PASS}
+      - LOG_FILE_CIBER=${LOG_FILE_CIBER}
+    depends_on:
+      - ciber
+    restart: unless-stopped
+
+  # DHCP
+  servicio-dhcp:
+    build:
+      context: ../dockerfiles/dhcp
+    image: servicio-dhcp-final
+    container_name: dhcp_server_ciber
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "67:67/udp"
+    depends_on:
+      - ciber
+    restart: unless-stopped
+
+# OpenLdap y oracle (desarollo futuro)
+  openldap:
+    image: osixia/openldap:latest
+    container_name: ldap_server_caronte
+    environment:
+      - LDAP_ORGANISATION="Caronte SA"
+      - LDAP_DOMAIN="caronte.es"
+      - LDAP_ADMIN_PASSWORD="admin"
+    ports:
+      - "389:389"
+    restart: unless-stopped
+
+  oracle-db:
+    build:
+      context: ../dockerfiles/oracle
+    image: servicio-oracle-final
+    container_name: oracle_ciber
+    ports:
+      - "1521:1521"
+    depends_on:
+      - ciber
+      - openldap
+    restart: unless-stopped
+
+  servidor-web:
+    build:
+      context: ../dockerfiles/web
+    image: servicio-web-final
+    container_name: web_cliente_oracle
+    ports:
+      - "8080:80"
+    depends_on:
+      - oracle-db
+    restart: unless-stopped

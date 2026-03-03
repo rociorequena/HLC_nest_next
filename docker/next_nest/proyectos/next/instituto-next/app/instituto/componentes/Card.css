@@ -1,0 +1,27 @@
+.link-1 {
+    text-decoration: none;
+}
+
+.card-1 {
+    height: 250px;
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-start;
+    padding: 20px;
+    transition: 0.3s;
+
+}
+
+.card-1:hover {
+    transform: scale(1.02);
+}
+
+
+.tit-2 {
+    color: white;
+    font-size: 1.5rem;
+    margin-top: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}

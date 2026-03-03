@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Películas - ASIR</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; padding: 20px; }
+        .movie-table-card { background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 20px; }
+        .header-blue { background: #0d6efd; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container movie-table-card">
+        <h2 class="header-blue text-center">Tabla de Películas</h2>
+        
+        <div class="row g-2 mb-4 p-3 bg-light rounded border">
+            <div class="col-md-4">
+                <input type="text" id="filterTitle" class="form-control" placeholder="Filtrar por título...">
+            </div>
+            <div class="col-md-3">
+                <input type="number" id="startYear" class="form-control" placeholder="Año Desde" value="1990">
+            </div>
+            <div class="col-md-3">
+                <input type="number" id="endYear" class="form-control" placeholder="Año Hasta" value="2026">
+            </div>
+            <div class="col-md-2">
+                <button onclick="cargarPelis()" class="btn btn-primary w-100">Aplicar Filtro</button>
+            </div>
+        </div>
+
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Director</th>
+                    <th>Año</th>
+                    <th>Minutos</th>
+                </tr>
+            </thead>
+            <tbody id="listaPelis"></tbody>
+        </table>
+    </div>
+
+    <script>
+        async function cargarPelis() {
+            const t = document.getElementById('filterTitle').value;
+            const s = document.getElementById('startYear').value || 1900;
+            const e = document.getElementById('endYear').value || 2026;
+            
+            const res = await fetch(`http://localhost:3001/peliculas/filter?title=${t}&start=${s}&end=${e}`);
+            const data = await res.json();
+            
+            document.getElementById('listaPelis').innerHTML = data.map(m => `
+                <tr>
+                    <td>${m.id}</td>
+                    <td><strong>${m.title}</strong></td>
+                    <td>${m.director}</td>
+                    <td>${m.year}</td>
+                    <td>${m.length_minutes}</td>
+                </tr>
+            `).join('');
+        }
+        window.onload = cargarPelis;
+    </script>
+</body>
+</html>

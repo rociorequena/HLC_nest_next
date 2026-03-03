@@ -1,0 +1,10 @@
+app:
+  image:
+    repository: rocio21/webtallerclase
+    tag: latest
+    pullPolicy: Always
+  containerPort:
+  container:
+    name: webtaller
+    Port:
+    replicas: 1

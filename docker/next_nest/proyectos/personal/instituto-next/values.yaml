@@ -1,0 +1,21 @@
+app:
+  name: webnext
+  image:
+    repository: rocio21/final-next
+    tag: latest
+    pullPolicy: Always
+  # containerPort: 3001   
+  container: 
+    name: webnest
+    port: 3001
+    replicas: 3
+  service:
+    type: NodePort
+    port: 3001
+    nodePort: 30022
+    sshPort: 3456
+    sshTargetPort: 3456
+    sshNodePort: 30456
+  ingress:
+    host: instituto.reqgon.es
+    port: 3001

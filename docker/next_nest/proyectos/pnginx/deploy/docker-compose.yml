@@ -1,0 +1,23 @@
+services:
+  web:
+    build:
+      context: /home/rocio/hlc/docker/next_nest/
+      dockerfile: ./dockerfiles/nginx/dockerfiles
+    container_name: ctnginx
+    image: rocio21/nginx
+    ports:
+      - "8081:80"
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs:/root/logs
+    networks:
+      netrocionginx:
+        ipv4_address: 172.30.17.3
+networks:
+  netrocionginx:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.17.0/24

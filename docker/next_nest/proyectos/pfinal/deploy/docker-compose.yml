@@ -1,0 +1,23 @@
+services:
+  web:
+    build:
+      context: /home/rocio/hlc/docker/next_nest/
+      dockerfile: ./dockerfiles/final-next/Dockerfile
+    container_name: final-next
+    image: rocio21/final-next
+    ports:
+      - "8080:80"
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs:/root/logs
+    networks:
+      netrociofinal:
+        ipv4_address: 172.30.12.3
+networks:
+  netrociofinal:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.12.0/24

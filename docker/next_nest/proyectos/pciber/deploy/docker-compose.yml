@@ -1,0 +1,21 @@
+services:
+  web:
+    build:
+      context: /home/rocio/hlc/docker/next_nest/
+      dockerfile: ./dockerfiles/ciber/dockerfiles
+    container_name: ctciber
+    image: rocio21/ciberseguridad
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs:/root/logs
+    networks:
+      netrociociber:
+        ipv4_address: 172.30.11.3
+networks:
+  netrociociber:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.11.0/24

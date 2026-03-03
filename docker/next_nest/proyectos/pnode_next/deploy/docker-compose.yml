@@ -1,0 +1,23 @@
+services:
+  web:
+    build:
+      context: /home/rocio/hlc/docker/next_nest/
+      dockerfile: ./dockerfiles/node_next/dockerfiles
+    container_name: ctnode_next
+    image: rocio21/node_next
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs:/root/logs
+    networks:
+      netrocionext:
+        ipv4_address: 172.30.18.3
+networks:
+  netrocionext:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.18.0/24

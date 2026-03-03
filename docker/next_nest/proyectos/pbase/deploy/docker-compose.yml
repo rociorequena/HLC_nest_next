@@ -1,0 +1,21 @@
+services:
+  web:
+    build:
+      context: /home/rocio/hlc/docker/next_nest/
+      dockerfile: ./dockerfiles/base/dockerfiles
+    container_name: ctbase
+    image: rocio21/ubbase
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs:/root/logs
+    networks:
+      netrocio:
+        ipv4_address: 172.30.10.3
+networks:
+  netrocio:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.10.0/24

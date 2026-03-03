@@ -1,0 +1,9 @@
+FROM rocio21/nestpokeapi
+
+
+RUN mkdir -p /root/admin/nginxpokeapi
+WORKDIR /root/admin/nginxpokeapi
+COPY ./dockerfiles/final_nest/admin/start.sh .
+RUN chmod +x ./start.sh
+
+ENTRYPOINT ["./start.sh"]

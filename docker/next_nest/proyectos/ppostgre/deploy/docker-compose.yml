@@ -1,0 +1,14 @@
+services:
+  web:
+    build:
+      context: /home/rocio/hlc/docker/next_nest/
+      dockerfile: ./dockerfiles/postgre/dockerfiles
+    container_name: ctpostgre
+    image: rocio21/postgre
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs:/root/logs
+

@@ -1,0 +1,9 @@
+.box-1 {
+    margin-top: 50px;
+}
+
+.grid-1 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+}

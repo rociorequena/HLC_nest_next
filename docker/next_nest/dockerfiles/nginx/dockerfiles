@@ -1,0 +1,12 @@
+FROM rocio21/ciberseguridad
+
+RUN apt-get update && apt-get install -y nginx 
+
+RUN mkdir -p /root/admin/nginx
+WORKDIR /root/admin/nginx
+# El start.sh de esta capa activa la auditoría
+COPY ./dockerfiles/nginx/admin/start.sh ./start.sh
+RUN chmod +x ./start.sh
+
+EXPOSE 80
+ENTRYPOINT ["./start.sh"]

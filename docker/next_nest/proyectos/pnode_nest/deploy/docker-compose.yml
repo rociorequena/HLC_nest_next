@@ -1,0 +1,13 @@
+services:
+  web:
+    build:
+      context: /home/rocio/hlc/docker/next_nest
+      dockerfile: ./dockerfiles/nest/dockerfiles
+    container_name: ctnestpokeapi
+    image: rocio21/nestpokeapi
+    ports:
+      - 3000:3000
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs:/root/logs

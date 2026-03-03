@@ -1,0 +1,13 @@
+
+> instituto-next@0.1.0 start
+> next start -p 3001
+
+▲ Next.js 16.1.1
+- Local:         http://localhost:3001
+- Network:       http://172.30.12.3:3001
+
+✓ Starting...
+✓ Ready in 760ms
+Error: Failed to find Server Action "x". This request might be from an older or newer deployment.
+Read more: https://nextjs.org/docs/messages/failed-to-find-server-action
+    at ignore-listed frames
