@@ -27,7 +27,7 @@ import { PokemonModule } from './pokemon/pokemon.module';
       host: process.env.DB_HOST || 'localhost',
       port: Number(process.env.DB_PORT) || 5432, 
       username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'usuario', 
+      password: process.env.DB_PASSWORD || '', 
       database: process.env.DB_DATABASE || 'nest',
       
       entities: [__dirname + '/**/*.entity{.ts,.js}'],

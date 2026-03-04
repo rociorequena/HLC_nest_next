@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.container.name }}-nginx
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.app.container.name }}-nginx
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app.container.name }}-nginx
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.container.name }}-nginx
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html-volume
+          mountPath: /usr/share/nginx/html
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: html-volume
+        configMap:
+          name: {{ .Values.app.container.name }}-html-config
+          items:
+          - key: pelicula.html
+            path: pelicula.html
+          - key: pokemon.html
+            path: pokemon.html
+      - name: nginx-conf
+        configMap:
+          name: {{ .Values.app.container.name }}-html-config
+          items:
+          - key: default.conf
+            path: default.conf

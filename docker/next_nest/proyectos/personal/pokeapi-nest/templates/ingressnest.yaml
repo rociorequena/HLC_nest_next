@@ -3,13 +3,25 @@ kind: Ingress
 metadata:
   name: {{ .Values.app.container.name }}-ingress
   namespace: {{ .Release.Namespace }}
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - host: {{ .Values.app.ingress.host }}
     http:
       paths:
+      - path: /pelicula.html
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.app.container.name }}-nginx-service
+            port:
+              number: 80
+      - path: /pokemon.html
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.app.container.name }}-nginx-service
+            port:
+              number: 80
       - path: /
         pathType: Prefix
         backend:

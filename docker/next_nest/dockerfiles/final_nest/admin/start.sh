@@ -69,9 +69,9 @@ construir_y_arrancar(){
         log "ADVERTENCIA: Directorio public no encontrado"
     fi
     
-    # Arrancar NestJS en segundo plano
-    log "Arrancando NestJS en segundo plano..."
-    HOST=0.0.0.0 npm run start:prod &
+    # Arrancar NestJS
+    log "Arrancando NestJS..."
+    HOST=0.0.0.0 npm run start:prod
 }
 
 cargar_nginx(){
@@ -100,11 +100,11 @@ main(){
     log "=== Iniciando contenedor NestJS ==="
     log "Fecha: $(date)"
     load_entrypoint_base
-    load_entrypoint_postgre
-    load_entrypoint_nginx
+    #load_entrypoint_postgre
+    #load_entrypoint_nginx
     directorio_de_trabajo
     construir_y_arrancar
-    cargar_nginx
+    #cargar_nginx
 }
 
 main
