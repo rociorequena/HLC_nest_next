@@ -1,44 +1,44 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ .Values.app.container.name }}-nginx
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app: {{ .Values.app.container.name }}-nginx
-    app.kubernetes.io/instance: {{ .Release.Name }}
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: {{ .Values.app.container.name }}-nginx
-  template:
-    metadata:
-      labels:
-        app: {{ .Values.app.container.name }}-nginx
-        app.kubernetes.io/instance: {{ .Release.Name }}
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:alpine
-        ports:
-        - containerPort: 80
-        volumeMounts:
-        - name: html-volume
-          mountPath: /usr/share/nginx/html
-        - name: nginx-conf
-          mountPath: /etc/nginx/conf.d
-      volumes:
-      - name: html-volume
-        configMap:
-          name: {{ .Values.app.container.name }}-html-config
-          items:
-          - key: pelicula.html
-            path: pelicula.html
-          - key: pokemon.html
-            path: pokemon.html
-      - name: nginx-conf
-        configMap:
-          name: {{ .Values.app.container.name }}-html-config
-          items:
-          - key: default.conf
-            path: default.conf
+apiVersion: apps/v1 # Especifica la versión de la API de Kubernetes para gestionar despliegues de aplicaciones.
+kind: Deployment # Indica que este objeto es un Deployment, encargado de mantener vivos los pods.
+metadata: # Sección de datos de identificación del recurso.
+  name: {{ .Values.app.container.name }}-nginx # Nombre dinámico del despliegue combinando el nombre de la app y el sufijo nginx.
+  namespace: {{ .Release.Namespace }} # Espacio de nombres donde se va a ejecutar, según lo definido en el despliegue de Helm.
+  labels: # Etiquetas para organizar el clúster y que el Service pueda encontrar estos pods.
+    app: {{ .Values.app.container.name }}-nginx # Etiqueta con el nombre de nuestra aplicación web Nginx.
+    app.kubernetes.io/instance: {{ .Release.Name }} # Identificador de la instancia de Helm que estamos lanzando.
+spec: # Especificaciones de cómo queremos que sea este despliegue.
+  replicas: 2 # Definimos que solo queremos 1 contenedor de Nginx corriendo (para ahorrar recursos en la VPS).
+  selector: # Mecanismo que usa el Deployment para saber qué pods están bajo su control.
+    matchLabels: # Busca pods que tengan exactamente las etiquetas definidas aquí abajo.
+      app: {{ .Values.app.container.name }}-nginx # Debe coincidir con la etiqueta del pod definida en el template.
+  template: # La "plantilla" o receta que se usará para crear cada uno de los pods.
+    metadata: # Metadatos que se le pegarán al pod cuando se cree.
+      labels: # Estas son las etiquetas físicas que llevará el pod.
+        app: {{ .Values.app.container.name }}-nginx # Etiqueta clave para que el selector lo reconozca.
+        app.kubernetes.io/instance: {{ .Release.Name }} # Etiqueta para vincularlo a la release de Helm.
+    spec: # Definición técnica de lo que hay dentro del pod.
+      containers: # Lista de contenedores que se van a ejecutar dentro (en este caso, solo uno).
+      - name: nginx # Nombre del contenedor dentro del pod.
+        image: nginx:alpine # Imagen de Nginx súper ligera (Alpine) para que descargue rápido en la VPS.
+        ports: # Puertos que el contenedor expone internamente.
+        - containerPort: 80 # Puerto estándar HTTP donde Nginx sirve las páginas web.
+        volumeMounts: # Aquí es donde "mapeamos" las carpetas internas con los volúmenes externos.
+        - name: html-volume # Nombre del volumen que vamos a montar (definido abajo en 'volumes').
+          mountPath: /usr/share/nginx/html # Carpeta interna de Nginx donde espera encontrar los archivos .html.
+        - name: nginx-conf # Nombre del volumen de configuración.
+          mountPath: /etc/nginx/conf.d # Carpeta interna donde Nginx lee los archivos de configuración .conf.
+      volumes: # Definición de los orígenes de datos que el contenedor va a usar como carpetas.
+      - name: html-volume # Nombre del volumen para los archivos de la web.
+        configMap: # Indicamos que el contenido de esta carpeta sale de un ConfigMap de Kubernetes.
+          name: {{ .Values.app.container.name }}-html-config # El nombre del ConfigMap que creamos con los HTML de Pokémon y Pelis.
+          items: # Selección específica de qué "claves" del ConfigMap queremos convertir en archivos.
+          - key: pelicula.html # Coge el contenido de 'pelicula.html' del ConfigMap...
+            path: pelicula.html # ...y créalo como un archivo llamado 'pelicula.html' en la ruta de montaje.
+          - key: pokemon.html # Coge el contenido de 'pokemon.html' del ConfigMap...
+            path: pokemon.html # ...y créalo como un archivo llamado 'pokemon.html'.
+      - name: nginx-conf # Nombre del volumen para la configuración del servidor.
+        configMap: # También viene de un ConfigMap.
+          name: {{ .Values.app.container.name }}-html-config # Usamos el mismo ConfigMap que antes.
+          items: # Selección del archivo de configuración.
+          - key: default.conf # Coge la configuración del servidor que definimos...
+            path: default.conf # ...y métela como el archivo 'default.conf' para que Nginx la use al arrancar.

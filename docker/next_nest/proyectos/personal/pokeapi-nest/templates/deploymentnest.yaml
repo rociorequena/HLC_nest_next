@@ -1,37 +1,37 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ .Values.app.container.name }}-deployment
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app: {{ .Values.app.container.name }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-spec:
-  replicas: {{ .Values.app.container.replicas }}
-  selector:
-    matchLabels:
-      app: {{ .Values.app.container.name }}
-  template:
-    metadata:
-      labels:
-        app: {{ .Values.app.container.name }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-    spec:
-      containers:
-      - name: {{ .Values.app.container.name }}
-        image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
-        imagePullPolicy: {{ .Values.app.image.pullPolicy }}
-        ports:
-        - containerPort: {{ .Values.app.container.port }}
-        - containerPort: {{ .Values.app.service.sshPort }}
-        env:
-        - name: DB_HOST
-          value: {{ .Values.postgres.name }}
-        - name: DB_PORT
-          value: {{ .Values.postgres.service.port | quote }}
-        - name: DB_DATABASE
-          value: {{ .Values.postgres.auth.database }}
-        - name: DB_USERNAME
-          value: {{ .Values.postgres.auth.username }}
-        - name: DB_PASSWORD
-          value: {{ .Values.postgres.auth.password }}
+apiVersion: apps/v1 # Define la versión de la API de Kubernetes para gestionar aplicaciones 
+kind: Deployment # Indica que este recurso sirve para gestionar el ciclo de vida de los pods/contenedores.
+metadata: # Datos informativos sobre este despliegue.
+  name: {{ .Values.app.container.name }}-deployment # Nombre único del despliegue usando plantillas de Helm.
+  namespace: {{ .Release.Namespace }} # Espacio de nombres donde se desplegará .
+  labels: # Etiquetas para organizar y filtrar recursos dentro del clúster.
+    app: {{ .Values.app.container.name }} # Etiqueta con el nombre de la aplicación.
+    app.kubernetes.io/instance: {{ .Release.Name }} # Etiqueta técnica que identifica la instancia de Helm.
+spec: # Especificaciones del estado deseado del despliegue.
+  replicas: {{ .Values.app.container.replicas }} # Define cuántos contenedores idénticos se ejecutarán 
+  selector: # Define cómo el Deployment identifica a los pods que debe gestionar.
+    matchLabels: # Debe coincidir con las etiquetas del pod que definimos más abajo.
+      app: {{ .Values.app.container.name }} # Filtra los pods que tengan esta etiqueta de aplicación.
+  template: # Plantilla que define cómo se crearán los nuevos pods.
+    metadata: # Metadatos que se le asignarán a cada pod creado.
+      labels: # Etiquetas que se pegarán a cada instancia del contenedor.
+        app: {{ .Values.app.container.name }} # Etiqueta necesaria para que el selector anterior lo encuentre.
+        app.kubernetes.io/instance: {{ .Release.Name }} # Referencia a la instalación de Helm.
+    spec: # Especificación técnica del interior del pod 
+      containers: # Lista de contenedores que correrán dentro del pod.
+      - name: {{ .Values.app.container.name }} # Nombre del contenedor específico.
+        image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}" # Ruta de la imagen en el Registry  y su versión 
+        imagePullPolicy: {{ .Values.app.image.pullPolicy }} # Política de descarga
+        ports: # Puertos que el contenedor expone internamente.
+        - containerPort: {{ .Values.app.container.port }} # Puerto principal de la aplicación web 
+        - containerPort: {{ .Values.app.service.sshPort }} # Puerto adicional para acceso SSH si fuera necesario 
+        env: # Sección de variables de entorno (datos que el código lee por dentro).
+        - name: DB_HOST # Nombre de la variable que usará tu código 
+          value: {{ .Values.postgres.name }} # Valor inyectado: nombre del servicio de la base de datos.
+        - name: DB_PORT # Variable para el puerto de la base de datos.
+          value: {{ .Values.postgres.service.port | quote }} # Valor del puerto (entre comillas para evitar errores de tipo numérico).
+        - name: DB_DATABASE # Variable para el nombre de la base de datos.
+          value: {{ .Values.postgres.auth.database }} # Valor inyectado desde la configuración de Postgres.
+        - name: DB_USERNAME # Variable para el usuario de acceso a la DB.
+          value: {{ .Values.postgres.auth.username }} # Usuario definido en el archivo de valores.
+        - name: DB_PASSWORD # Variable para la contraseña de acceso a la DB.
+          value: {{ .Values.postgres.auth.password }} # Contraseña secreta para la conexión.

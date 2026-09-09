@@ -1,31 +1,31 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ .Values.app.container.name }}-ingress
-  namespace: {{ .Release.Namespace }}
-spec:
-  rules:
-  - host: {{ .Values.app.ingress.host }}
-    http:
-      paths:
-      - path: /pelicula.html
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Values.app.container.name }}-nginx-service
-            port:
-              number: 80
-      - path: /pokemon.html
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Values.app.container.name }}-nginx-service
-            port:
-              number: 80
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Values.app.container.name }}-service
-            port:
-              number: {{ .Values.app.ingress.port }}
+apiVersion: networking.k8s.io/v1 # Usamos la API de red de Kubernetes para gestionar el tráfico externo.
+kind: Ingress # Tipo de recurso Ingress: el que expone servicios HTTP/HTTPS al exterior.
+metadata: # Datos para identificar este "router" virtual.
+  name: {{ .Values.app.container.name }}-ingress # Nombre del Ingress, usando el nombre de la app de los values.
+  namespace: {{ .Release.Namespace }} # Se crea en el mismo namespace donde tenemos todo lo demás.
+spec: # Aquí definimos las reglas de tráfico.
+  rules: # Lista de reglas basadas en el dominio o la ruta.
+  - host: {{ .Values.app.ingress.host }} # El dominio que escribiremos en el navegador (ej: mi-web.local).
+    http: # Protocolo HTTP para las rutas.
+      paths: # Lista de rutas que vamos a mapear.
+      - path: /pelicula.html # Si el usuario entra en dominio.com/pelicula.html...
+        pathType: Prefix # Coincidencia basada en el prefijo de la URL.
+        backend: # ...lo mandamos a este destino:
+          service: # Usamos un Service para llegar al pod.
+            name: {{ .Values.app.container.name }}-nginx-service # El servicio que apunta al Nginx de antes.
+            port: # Puerto del servicio de Nginx.
+              number: 80 # El puerto 80 que es el estándar de Nginx.
+      - path: /pokemon.html # Si el usuario entra en dominio.com/pokemon.html...
+        pathType: Prefix # Tipo de ruta por prefijo.
+        backend: # Destino para Pokémon:
+          service: # Apuntamos al servicio de Nginx.
+            name: {{ .Values.app.container.name }}-nginx-service # Usamos el mismo servicio de Nginx para los HTML.
+            port: # Puerto de destino.
+              number: 80 # Puerto 80.
+      - path: / # Para cualquier otra ruta que empiece por / (la raíz)...
+        pathType: Prefix # Todo lo que no sean los HTML de arriba caerá aquí.
+        backend: # Destino para el backend/API:
+          service: # Apuntamos al servicio de la aplicación lógica.
+            name: {{ .Values.app.container.name }}-service # Este es el servicio que conecta con nuestra API.
+            port: # Puerto configurado para el backend.
+              number: {{ .Values.app.ingress.port }} # El puerto que hayamos definido en los values (ej: 5000).

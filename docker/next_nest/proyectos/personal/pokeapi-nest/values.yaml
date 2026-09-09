@@ -8,7 +8,7 @@ app:
   container: 
     name: webnest
     port: 3001
-    replicas: 3
+    replicas: 2
   service:
     type: NodePort
     port: 3001

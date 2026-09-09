@@ -1,18 +1,18 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Values.app.container.name }}-service
-  namespace: {{ .Release.Namespace }}
-spec:
-  type: {{ .Values.app.service.type }}
-  selector:
-    app: {{ .Values.app.container.name }}
-  ports:
-    - name: http
-      port: {{ .Values.app.service.port }}
-      targetPort: {{ .Values.app.container.port }}
-      nodePort: {{ .Values.app.service.nodePort }}
-    - name: ssh
-      port: {{ .Values.app.service.sshPort }}
-      targetPort: {{ .Values.app.service.sshPort }}
-      nodePort: {{ .Values.app.service.sshNodePort }}
+apiVersion: v1 # Versión de la API de Kubernetes para objetos de red básicos como este.
+kind: Service # Tipo de recurso Service: sirve para dar una dirección fija a un grupo de pods.
+metadata: # Datos para identificar el servicio dentro de la red del clúster.
+  name: {{ .Values.app.container.name }}-service # Nombre del servicio, sacado de la configuración de la app.
+  namespace: {{ .Release.Namespace }} # El espacio de nombres donde se va a crear este balanceador.
+spec: # Definición de cómo se va a comportar este servicio de red.
+  type: {{ .Values.app.service.type }} # Tipo de servicio (ClusterIP, NodePort o LoadBalancer) según los values.
+  selector: # La clave de todo: indica a qué pods debe enviar el tráfico este servicio.
+    app: {{ .Values.app.container.name }} # Busca todos los pods que tengan esta etiqueta exacta.
+  ports: # Lista de puertos que vamos a mapear y exponer.
+    - name: http # Nombre para el puerto de tráfico web/API.
+      port: {{ .Values.app.service.port }} # El puerto "fantasma" que el servicio expone dentro del clúster.
+      targetPort: {{ .Values.app.container.port }} # El puerto real donde está escuchando el proceso dentro del contenedor.
+      nodePort: {{ .Values.app.service.nodePort }} # El puerto que se abre en la IP de la VPS para entrar desde fuera.
+    - name: ssh # Nombre para el puerto de gestión remota SSH.
+      port: {{ .Values.app.service.sshPort }} # Puerto del servicio para conexiones SSH internas.
+      targetPort: {{ .Values.app.service.sshPort }} # Puerto del contenedor donde corre el servidor SSH.
+      nodePort: {{ .Values.app.service.sshNodePort }} # El puerto externo en la VPS para entrar por SSH al contenedor.

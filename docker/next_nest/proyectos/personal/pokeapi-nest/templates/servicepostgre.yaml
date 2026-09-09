@@ -1,17 +1,17 @@
-{{- if .Values.postgres.persistence.enabled }}
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Values.postgres.name }}
-  namespace: {{ .Release.Namespace }}
-spec:
-  type: ClusterIP
-  selector:
-    app: {{ .Values.postgres.name }}
-    app.kubernetes.io/component: postgres
-    app.kubernetes.io/instance: {{ .Release.Name }}
-  ports:
-    - name: pg
-      port: {{ .Values.postgres.service.port }}
-      targetPort: 5432
-{{- end }}
+{{- if .Values.postgres.persistence.enabled }} # Solo crea este recurso si en los values hemos activado la persistencia de datos.
+apiVersion: v1 # Versión de la API estándar para objetos de red internos.
+kind: Service # Tipo de recurso Service: para que el backend pueda encontrar la base de datos siempre en la misma IP.
+metadata: # Datos de identificación del servicio de base de datos.
+  name: {{ .Values.postgres.name }} # Nombre del servicio (normalmente "postgres"), que servirá de HOST para la conexión.
+  namespace: {{ .Release.Namespace }} # Se despliega en el mismo espacio de nombres que el resto del proyecto.
+spec: # Definición de la configuración de red del servicio.
+  type: ClusterIP # Tipo de servicio interno: la base de datos NO debe ser accesible desde fuera de la VPS por seguridad.
+  selector: # Etiquetas para localizar los pods de la base de datos en el clúster.
+    app: {{ .Values.postgres.name }} # Busca pods que se llamen como el valor de postgres.name.
+    app.kubernetes.io/component: postgres # Filtra específicamente por el componente de base de datos.
+    app.kubernetes.io/instance: {{ .Release.Name }} # Asegura que el pod pertenece a esta misma instalación de Helm.
+  ports: # Mapeo de puertos para la comunicación SQL.
+    - name: pg # Nombre identificativo para el tráfico de PostgreSQL.
+      port: {{ .Values.postgres.service.port }} # Puerto que el servicio ofrece al resto de pods (ej. 5432).
+      targetPort: 5432 # Puerto real donde está escuchando el proceso de Postgres dentro de su contenedor.
+{{- end }} # Cierre del condicional de Helm.

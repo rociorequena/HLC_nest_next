@@ -1,51 +1,51 @@
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: stateful-{{ .Values.postgres.name }}
-  namespace: {{ .Release.Namespace }}
-spec:
-  serviceName: {{ .Values.postgres.name }}
-  replicas: 1
-  selector:
-    matchLabels:
-      app: {{ .Values.postgres.name }}
-      app.kubernetes.io/component: postgres
-      app.kubernetes.io/instance: {{ .Release.Name }}
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: postgres
-        app.kubernetes.io/instance: {{ .Release.Name }}
-        app: {{ .Values.postgres.name }}
-    spec:
-      containers:
-        - name: postgres
-          image: "{{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}"
-          imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
-          ports:
-            - containerPort: 5432
+apiVersion: apps/v1 # Versión de la API de Kubernetes para objetos con estado.
+kind: StatefulSet # Usamos StatefulSet en vez de Deployment porque las bases de datos necesitan identidad persistente.
+metadata: # Datos para identificar este conjunto de pods con estado.
+  name: stateful-{{ .Values.postgres.name }} # Nombre del recurso, metiéndole el prefijo 'stateful' para no liarnos.
+  namespace: {{ .Release.Namespace }} # Se queda en el mismo namespace que todo el proyecto.
+spec: # Especificaciones de cómo queremos que se comporte la base de datos.
+  serviceName: {{ .Values.postgres.name }} # Vincula este set con el servicio que creamos antes para que el DNS interno funcione.
+  replicas: 2 # Dos instancias de la BD para evitar líos de sincronización de datos en la VPS.
+  selector: # El filtro para que el controlador sepa qué pods tiene que vigilar.
+    matchLabels: # Deben coincidir con las etiquetas del template de abajo.
+      app: {{ .Values.postgres.name }} # Filtro por nombre de app.
+      app.kubernetes.io/component: postgres # Filtro por componente (BD).
+      app.kubernetes.io/instance: {{ .Release.Name }} # Filtro por instancia de Helm.
+  template: # La plantilla del pod que se va a crear.
+    metadata: # Etiquetas que se le pegan al pod de Postgres.
+      labels: 
+        app.kubernetes.io/component: postgres # Identifica que es el motor de base de datos.
+        app.kubernetes.io/instance: {{ .Release.Name }} # Identifica la versión del despliegue.
+        app: {{ .Values.postgres.name }} # Nombre general de la app para el selector.
+    spec: # Qué hay realmente dentro del pod.
+      containers: # Definición del contenedor de PostgreSQL.
+        - name: postgres # Nombre del contenedor.
+          image: "{{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}" # Imagen oficial y versión sacadas de los values.
+          imagePullPolicy: {{ .Values.postgres.image.pullPolicy }} # Cómo descargar la imagen (siempre o si no está).
+          ports: # Puertos que abre el contenedor.
+            - containerPort: 5432 # Puerto por defecto de PostgreSQL.
           # Variables de entorno del configmap y secret para la autenticación de PostgreSQL
-          env:
+          env: # Configuración interna de la base de datos mediante variables.
             # Estas variables se corresponden con las que se usan en el docker-compose.yml para configurar PostgreSQL
-            - name: POSTGRES_DB
+            - name: POSTGRES_DB # Nombre de la base de datos que se creará al arrancar.
               value: {{ .Values.postgres.auth.database | quote }} # '' para que se interprete como string aunque sea un nombre sin espacios
-            - name: POSTGRES_USER
-              value: {{ .Values.postgres.auth.username | quote }}
-            - name: POSTGRES_PASSWORD
+            - name: POSTGRES_USER # Usuario administrador de la base de datos.
+              value: {{ .Values.postgres.auth.username | quote }} 
+            - name: POSTGRES_PASSWORD # Contraseña del usuario (ojo, aquí vendría de los values).
               value: {{ .Values.postgres.auth.password | quote }}
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
-          volumeMounts:
-            - name: data
-              mountPath: /var/lib/postgresql/data
-  volumeClaimTemplates:
-    - metadata:
-        name: data
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        {{- if .Values.postgres.persistence.storageClassName }}
-        storageClassName: {{ .Values.postgres.persistence.storageClassName | quote }}
-        {{- end }}
-        resources:
-          requests:
-            storage: {{ .Values.postgres.persistence.size | quote }}
+            - name: PGDATA # Ruta donde Postgres guarda físicamente los ficheros de datos.
+              value: /var/lib/postgresql/data/pgdata # Variable necesaria para que no haya conflictos de permisos.
+          volumeMounts: # "Enchufamos" el disco duro al contenedor.
+            - name: data # Nombre del volumen definido más abajo.
+              mountPath: /var/lib/postgresql/data # Carpeta del contenedor donde se guardará todo permanentemente.
+  volumeClaimTemplates: # Esto es lo que pide el disco duro a la VPS automáticamente.
+    - metadata: # Metadatos del disco que vamos a crear.
+        name: data # Nombre del volumen que coincide con el mount de arriba.
+      spec: # Características del disco.
+        accessModes: ["ReadWriteOnce"] # Solo un pod puede escribir en este disco a la vez (por seguridad de datos).
+        {{- if .Values.postgres.persistence.storageClassName }} # Si la VPS tiene un tipo de disco específico (SSD, etc)...
+        storageClassName: {{ .Values.postgres.persistence.storageClassName | quote }} # ...se lo pedimos aquí.
+        {{- end }} # Fin del condicional.
+        resources: # Qué tamaño queremos para nuestra base de datos.
+          requests: # Petición de espacio.
+            storage: {{ .Values.postgres.persistence.size | quote }} # Gigas de disco que reservamos en la VPS (ej: 1Gi).

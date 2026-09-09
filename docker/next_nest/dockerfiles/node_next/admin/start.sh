@@ -17,7 +17,7 @@ main(){
     touch /root/logs/node_next/node_next.log
     load_entrypoint_nginx
     config_next
-    # No poner tail para que el script pueda retornar al `load_entrypoint_node` del image hijo
+    # No ponemos tail para que el script pueda retornar al `load_entrypoint_node` del image hijo
 }
 
 main
